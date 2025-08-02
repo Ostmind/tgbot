@@ -8,17 +8,17 @@ import (
 )
 
 type StorageUser struct {
-	storage storage.UserRepository
+	storage storage.Repository
 }
 
-func New(storage storage.UserRepository) *StorageUser {
+func New(storage storage.Repository) *StorageUser {
 	return &StorageUser{
 		storage: storage,
 	}
 }
 
-func (c StorageUser) AddUser(ctx context.Context, telegramID string, userName string) (id string, err error) {
-	id, err = c.storage.AddUser(ctx, telegramID, userName)
+func (c StorageUser) AddUser(ctx context.Context, telegramID string, userName string, password string) (id string, err error) {
+	id, err = c.storage.AddUser(ctx, telegramID, userName, password)
 
 	if err != nil {
 		return id, fmt.Errorf("failed to add user %w", err)
@@ -27,8 +27,8 @@ func (c StorageUser) AddUser(ctx context.Context, telegramID string, userName st
 	return id, nil
 }
 
-func (c StorageUser) GetUserByID(ctx context.Context, id string) (models.User, error) {
-	user, err := c.storage.GetUserByID(ctx, id)
+func (c StorageUser) GetUserByTelegramID(ctx context.Context, id string) (models.User, error) {
+	user, err := c.storage.GetUserByTelegramID(ctx, id)
 
 	if err != nil {
 		return user, fmt.Errorf("failed to get user %w", err)

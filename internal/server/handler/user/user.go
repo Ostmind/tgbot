@@ -1,36 +1,30 @@
 package user
 
 import (
-	"context"
 	"errors"
 	"log/slog"
 	"net/http"
 	"tgbot/internal/models"
+	"tgbot/internal/storage"
 
 	"github.com/labstack/echo/v4"
 )
 
-type UserManager interface {
-	AddUser(ctx context.Context, telegramID string, userName string) (id string, err error)
-	GetUserByID(ctx context.Context, id string) (models.User, error)
-	DeleteUser(ctx context.Context, id string) error
-}
-
-type UserController struct {
-	manager UserManager
+type Controller struct {
+	Manager storage.Repository
 	logger  *slog.Logger
 }
 
-func NewUserHandler(manager UserManager, log *slog.Logger) *UserController {
-	return &UserController{manager, log}
+func NewUserHandler(manager storage.Repository, log *slog.Logger) *Controller {
+	return &Controller{manager, log}
 }
 
-func (ctr UserController) GetUserByID(echo echo.Context) error {
+func (ctr Controller) GetUserByTelegramID(echo echo.Context) error {
 	ctr.logger.Debug("Get Request for User")
 
 	userID := echo.Param("userId")
 
-	res, err := ctr.manager.GetUserByID(echo.Request().Context(), userID)
+	res, err := ctr.Manager.GetUserByTelegramID(echo.Request().Context(), userID)
 	if err != nil {
 		return echo.NoContent(http.StatusInternalServerError)
 	}
@@ -38,14 +32,16 @@ func (ctr UserController) GetUserByID(echo echo.Context) error {
 	return echo.JSON(http.StatusOK, res)
 }
 
-func (ctr UserController) AddUser(echo echo.Context) error {
+func (ctr Controller) AddUser(echo echo.Context) error {
 	ctr.logger.Debug("Post Request for User")
 
 	telegramID := echo.Param("telegramID")
 
 	userName := echo.Param("userName")
 
-	res, err := ctr.manager.AddUser(echo.Request().Context(), telegramID, userName)
+	password := echo.Param("password")
+
+	res, err := ctr.Manager.AddUser(echo.Request().Context(), telegramID, userName, password)
 	if err != nil {
 		if errors.Is(err, models.ErrUnique) {
 			return echo.NoContent(http.StatusConflict)
@@ -57,12 +53,12 @@ func (ctr UserController) AddUser(echo echo.Context) error {
 	return echo.JSON(http.StatusOK, res)
 }
 
-func (ctr UserController) DeleteUser(echo echo.Context) error {
+func (ctr Controller) DeleteUser(echo echo.Context) error {
 	ctr.logger.Debug("Delete Request for User")
 
 	userID := echo.Param("userId")
 
-	err := ctr.manager.DeleteUser(echo.Request().Context(), userID)
+	err := ctr.Manager.DeleteUser(echo.Request().Context(), userID)
 	if err != nil {
 		if errors.Is(err, models.ErrNotFound) {
 			return echo.NoContent(http.StatusNotFound)

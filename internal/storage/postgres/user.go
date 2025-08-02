@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"tgbot/internal/models"
+	"tgbot/internal/utils"
 )
 
 type Users struct {
@@ -16,8 +17,8 @@ func NewUsers(db *Storage) (*Users, error) {
 	}, nil
 }
 
-func (c *Users) GetUserByID(ctx context.Context, id string) (user models.User, err error) {
-	sqlStatement := `SELECT * FROM public.users where id =$1`
+func (c *Users) GetUserByTelegramID(ctx context.Context, id string) (user models.User, err error) {
+	sqlStatement := `SELECT * FROM public.users where telegram_id =$1`
 
 	rows, err := c.db.DB.Query(ctx, sqlStatement, id)
 	if err != nil {
@@ -26,7 +27,7 @@ func (c *Users) GetUserByID(ctx context.Context, id string) (user models.User, e
 
 	defer rows.Close()
 
-	err = rows.Scan(&user.ID, &user.TelegramID, &user.UserName, &user.AuthSalt, &user.Created)
+	err = rows.Scan(&user.ID, &user.TelegramID, &user.UserName, &user.Password, &user.Created)
 
 	if err != nil {
 		return user, fmt.Errorf("failed to parse DB %w", err)
@@ -50,12 +51,17 @@ func (c *Users) DeleteUser(ctx context.Context, id string) error {
 	return nil
 }
 
-func (c *Users) AddUser(ctx context.Context, telegramID string, userName string) (id string, err error) {
+func (c *Users) AddUser(ctx context.Context, telegramID string, userName string, password string) (id string, err error) {
 	sqlStatement := `INSERT INTO public.users
-					(telegram_id,username,created_at) 
-					values ($1,$2,now());`
+					(telegram_id,username,created_at,password) 
+					values ($1,$2,now(),$3);`
 
-	result, err := c.db.DB.Exec(ctx, sqlStatement, telegramID, userName)
+	hashedPassword, err := utils.ValidateLengthAndStrings(password)
+	if err != nil {
+		return "", err
+	}
+
+	result, err := c.db.DB.Exec(ctx, sqlStatement, telegramID, userName, hashedPassword)
 
 	if err != nil {
 		if !result.Insert() {

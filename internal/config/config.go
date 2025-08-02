@@ -1,12 +1,11 @@
 package config
 
 import (
-	"errors"
 	"log"
-	"tgbot/internal/models"
 	"time"
 
 	"github.com/caarlos0/env/v11"
+	"github.com/hashicorp/go-multierror"
 )
 
 type AppConfig struct {
@@ -66,38 +65,40 @@ func MustNew() *AppConfig {
 	return &cfgEnv
 }
 
-func (cfg *AppConfig) Validate() (result error) {
+func (cfg *AppConfig) Validate() error {
+	var result *multierror.Error
+
 	if cfg.Srv.Host == "" {
-		result = errors.Join(result, models.ErrNoServerHost)
+		result = multierror.Append(result, ErrNoServerHost)
 	}
 
 	if cfg.Srv.Port == 0 {
-		result = errors.Join(result, models.ErrNoServerPort)
+		result = multierror.Append(result, ErrNoServerPort)
 	}
 
 	if cfg.DB.Host == "" {
-		result = errors.Join(result, models.ErrNoDBHost)
+		result = multierror.Append(result, ErrNoDBHost)
 	}
 
 	if cfg.DB.Port == "" {
-		result = errors.Join(result, models.ErrNoDBPort)
+		result = multierror.Append(result, ErrNoDBPort)
 	}
 
 	if cfg.DB.DBName == "" {
-		result = errors.Join(result, models.ErrNoDBName)
+		result = multierror.Append(result, ErrNoDBName)
 	}
 
 	if cfg.DB.DBUser == "" {
-		result = errors.Join(result, models.ErrNoDBUser)
+		result = multierror.Append(result, ErrNoDBUser)
 	}
 
 	if cfg.DB.DBPassword == "" {
-		result = errors.Join(result, models.ErrNoDBPassword)
+		result = multierror.Append(result, ErrNoDBPassword)
 	}
 
 	if cfg.Auth.JWTSecret == "" {
-		result = errors.Join(result, models.ErrNoJWTSecret)
+		result = multierror.Append(result, ErrNoJWTSecret)
 	}
 
-	return result
+	return result.ErrorOrNil()
 }

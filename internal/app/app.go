@@ -26,12 +26,12 @@ func New(logger *slog.Logger, cfg *config.AppConfig) (*App, error) {
 		return nil, fmt.Errorf("couldn't establish db connection %w", err)
 	}
 
-	categoryStorage, err := postgres.NewUsers(db)
+	userStorage, err := postgres.NewUsers(db)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create categories %w", err)
 	}
 
-	userManager := users.New(categoryStorage)
+	userManager := users.New(userStorage)
 
 	userHandler := userhandler.NewUserHandler(userManager, logger)
 

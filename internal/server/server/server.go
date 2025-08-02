@@ -24,14 +24,14 @@ type Server struct {
 func New(logger *slog.Logger,
 	cfg *config.ServerConfig,
 	db *postgres.Storage,
-	userHandler *user.UserController) *Server {
+	userHandler *user.Controller) *Server {
 	server := echo.New()
 
-	server.Use(middleware.LogRequest(logger))
+	server.Use(middleware.LogRequest(logger, userHandler))
 
 	categoryGroup := server.Group("users")
 
-	categoryGroup.GET("", userHandler.GetUserByID)
+	categoryGroup.GET("", userHandler.GetUserByTelegramID)
 	categoryGroup.DELETE("/:categoryId", userHandler.DeleteUser)
 	categoryGroup.POST("/create/:categoryName/:productId", userHandler.AddUser)
 
