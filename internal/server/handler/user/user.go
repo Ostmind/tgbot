@@ -4,19 +4,22 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"tgbot/internal/config"
 	"tgbot/internal/models"
 	"tgbot/internal/storage"
+	"tgbot/internal/utils"
 
 	"github.com/labstack/echo/v4"
 )
 
 type Controller struct {
 	Manager storage.Repository
+	cfg     *config.AppConfig
 	logger  *slog.Logger
 }
 
-func NewUserHandler(manager storage.Repository, log *slog.Logger) *Controller {
-	return &Controller{manager, log}
+func NewUserHandler(manager storage.Repository, cfg *config.AppConfig, log *slog.Logger) *Controller {
+	return &Controller{manager, cfg, log}
 }
 
 func (ctr Controller) GetUserByTelegramID(echo echo.Context) error {
@@ -37,11 +40,11 @@ func (ctr Controller) AddUser(echo echo.Context) error {
 
 	telegramID := echo.Param("telegramID")
 
-	userName := echo.Param("userName")
+	userNameCookie, _ := echo.Cookie("username")
 
-	password := echo.Param("password")
+	passwordCookie, _ := echo.Cookie("password")
 
-	res, err := ctr.Manager.AddUser(echo.Request().Context(), telegramID, userName, password)
+	res, refreshToken, err := ctr.Manager.AddUser(echo.Request().Context(), telegramID, userNameCookie.Value, passwordCookie.Value)
 	if err != nil {
 		if errors.Is(err, models.ErrUnique) {
 			return echo.NoContent(http.StatusConflict)
@@ -49,6 +52,19 @@ func (ctr Controller) AddUser(echo echo.Context) error {
 
 		return echo.NoContent(http.StatusInternalServerError)
 	}
+
+	jwt, err := utils.GenerateJWT(userNameCookie.Value, ctr.cfg.Auth.JWTAccessTokenTTL, ctr.cfg.Auth.JWTSecret)
+	if err != nil {
+		return echo.NoContent(http.StatusInternalServerError)
+	}
+
+	cookie := utils.SetCookie("AccessToken", jwt, ctr.cfg.Auth.JWTAccessTokenTTL, false)
+
+	echo.SetCookie(cookie)
+
+	cookie = utils.SetCookie("RefreshToken", refreshToken, ctr.cfg.Auth.JWTRefreshTokenTTL, true)
+
+	echo.SetCookie(cookie)
 
 	return echo.JSON(http.StatusOK, res)
 }

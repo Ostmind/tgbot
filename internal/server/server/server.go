@@ -22,24 +22,24 @@ type Server struct {
 }
 
 func New(logger *slog.Logger,
-	cfg *config.ServerConfig,
+	cfg *config.AppConfig,
 	db *postgres.Storage,
 	userHandler *user.Controller) *Server {
 	server := echo.New()
 
-	server.Use(middleware.LogRequest(logger, userHandler))
+	server.Use(middleware.LogRequest(logger, userHandler, cfg.Auth))
 
 	categoryGroup := server.Group("users")
 
 	categoryGroup.GET("", userHandler.GetUserByTelegramID)
-	categoryGroup.DELETE("/:categoryId", userHandler.DeleteUser)
-	categoryGroup.POST("/create/:categoryName/:productId", userHandler.AddUser)
+	categoryGroup.DELETE("/:userId", userHandler.DeleteUser)
+	categoryGroup.POST("/create/:telegramID", userHandler.AddUser)
 
 	return &Server{
 		logger:  logger,
 		server:  server,
 		storage: db,
-		port:    cfg.Port,
+		port:    cfg.Srv.Port,
 	}
 }
 func (s Server) Run() {

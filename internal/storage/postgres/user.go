@@ -51,31 +51,36 @@ func (c *Users) DeleteUser(ctx context.Context, id string) error {
 	return nil
 }
 
-func (c *Users) AddUser(ctx context.Context, telegramID string, userName string, password string) (id string, err error) {
+func (c *Users) AddUser(ctx context.Context, telegramID string, userName string, password string) (id string, refreshToken string, err error) {
 	sqlStatement := `INSERT INTO public.users
-					(telegram_id,username,created_at,password) 
-					values ($1,$2,now(),$3);`
+					(telegram_id,username,created_at,password,refresh_token) 
+					values ($1,$2,now(),$3,$4);`
 
 	hashedPassword, err := utils.ValidateLengthAndStrings(password)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	result, err := c.db.DB.Exec(ctx, sqlStatement, telegramID, userName, hashedPassword)
+	hashedRefreshToken, err := utils.NewRefreshToken()
+	if err != nil {
+		return "", "", err
+	}
+
+	result, err := c.db.DB.Exec(ctx, sqlStatement, telegramID, userName, hashedPassword, hashedRefreshToken)
 
 	if err != nil {
 		if !result.Insert() {
-			return "", models.ErrUnique
+			return "", "", models.ErrUnique
 		}
 
-		return "", fmt.Errorf("error adding to DB %w", err)
+		return "", "", fmt.Errorf("error adding to DB %w", err)
 	}
 
 	sqlStatement = `SELECT id FROM public.categories where telegram_id = $1`
 
 	rows, err := c.db.DB.Query(ctx, sqlStatement, telegramID)
 	if err != nil {
-		return "", fmt.Errorf("failed to query DB %w", err)
+		return "", "", fmt.Errorf("failed to query DB %w", err)
 	}
 
 	defer rows.Close()
@@ -83,8 +88,8 @@ func (c *Users) AddUser(ctx context.Context, telegramID string, userName string,
 	err = rows.Scan(&id)
 
 	if err != nil {
-		return "", fmt.Errorf("failed to parse DB %w", err)
+		return "", "", fmt.Errorf("failed to parse DB %w", err)
 	}
 
-	return id, nil
+	return id, refreshToken, nil
 }

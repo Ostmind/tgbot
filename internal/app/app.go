@@ -33,9 +33,9 @@ func New(logger *slog.Logger, cfg *config.AppConfig) (*App, error) {
 
 	userManager := users.New(userStorage)
 
-	userHandler := userhandler.NewUserHandler(userManager, logger)
+	userHandler := userhandler.NewUserHandler(userManager, cfg, logger)
 
-	server := srv.New(logger, &cfg.Srv, db, userHandler)
+	server := srv.New(logger, cfg, db, userHandler)
 
 	return &App{
 		server: server,

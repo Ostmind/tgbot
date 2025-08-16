@@ -2,47 +2,36 @@ package middleware
 
 import (
 	"log/slog"
+	"net/http"
+	"strings"
+	"tgbot/internal/config"
+	"tgbot/internal/server/auth"
 	"tgbot/internal/server/handler/user"
-	"tgbot/internal/utils"
 	"time"
 
 	"github.com/labstack/echo/v4"
 )
 
-func LogRequest(logger *slog.Logger, manager *user.Controller) echo.MiddlewareFunc {
+func LogRequest(logger *slog.Logger, manager *user.Controller, cfgAuth config.AuthConfig) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(echo echo.Context) error {
 			start := time.Now()
 
-			userName := echo.Param("userName")
+			if !(echo.Request().Method == http.MethodPost && strings.Contains(echo.Request().URL.String(), "/users/create")) {
+				err := auth.Authentication(echo, manager, cfgAuth)
+				if err != nil {
+					logger.Error("Request error",
+						"error", err,
+						"method", echo.Request().Method,
+						"url", echo.Request().URL.String())
 
-			password := echo.Param("password")
+					echo.Error(err)
 
-			userRepository, err := manager.Manager.GetUserByTelegramID(echo.Request().Context(), userName)
-			if err != nil {
-				logger.Error("Request error",
-					"error", err,
-					"method", echo.Request().Method,
-					"url", echo.Request().URL.String())
-
-				echo.Error(err)
-
-				return nil
+					return nil
+				}
 			}
 
-			err = utils.ComparePassword(userRepository.Password, password)
-			if err != nil {
-				logger.Error("Request error",
-					"error", err,
-					"method", echo.Request().Method,
-					"url", echo.Request().URL.String())
-
-				echo.Error(err)
-
-				return nil
-			}
-
-			err = next(echo)
+			err := next(echo)
 
 			stop := time.Now()
 

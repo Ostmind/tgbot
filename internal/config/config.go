@@ -39,10 +39,10 @@ type DatabaseConfig struct {
 }
 
 type AuthConfig struct {
-	JWTSecret          string `env:"JWT_SECRET"`
-	JWTAccessTokenTTL  string `env:"JWT_ACCESS_TOKEN"  envDefault:"2h"`
-	JWTRefreshTokenTTL string `env:"JWT_REFRESH_TOKEN" envDefault:"2d"`
-	BcryptCost         int    `env:"BCRYPT_COST"       envDefault:"6"`
+	JWTSecret          string        `env:"JWT_SECRET"`
+	JWTAccessTokenTTL  time.Duration `env:"JWT_ACCESS_TOKEN"  envDefault:"2h"`
+	JWTRefreshTokenTTL time.Duration `env:"JWT_REFRESH_TOKEN" envDefault:"48h"`
+	BcryptCost         int           `env:"BCRYPT_COST"       envDefault:"6"`
 }
 
 type LoggingConfig struct {
