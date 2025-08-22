@@ -12,7 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func LogRequest(logger *slog.Logger, manager *user.Controller, cfgAuth config.AuthConfig) echo.MiddlewareFunc {
+func LogRequestAndAuthenticateUser(logger *slog.Logger, manager *user.Controller, cfgAuth config.AuthConfig) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(echo echo.Context) error {
 			start := time.Now()

@@ -5,9 +5,9 @@ import (
 	"log/slog"
 	"net/http"
 	"tgbot/internal/config"
+	"tgbot/internal/helpers"
 	"tgbot/internal/models"
 	"tgbot/internal/storage"
-	"tgbot/internal/utils"
 
 	"github.com/labstack/echo/v4"
 )
@@ -53,16 +53,16 @@ func (ctr Controller) AddUser(echo echo.Context) error {
 		return echo.NoContent(http.StatusInternalServerError)
 	}
 
-	jwt, err := utils.GenerateJWT(userNameCookie.Value, ctr.cfg.Auth.JWTAccessTokenTTL, ctr.cfg.Auth.JWTSecret)
+	jwt, err := helpers.GenerateJWT(userNameCookie.Value, ctr.cfg.Auth.JWTAccessTokenTTL, ctr.cfg.Auth.JWTSecret)
 	if err != nil {
 		return echo.NoContent(http.StatusInternalServerError)
 	}
 
-	cookie := utils.SetCookie("AccessToken", jwt, ctr.cfg.Auth.JWTAccessTokenTTL, false)
+	cookie := helpers.SetCookie("AccessToken", jwt, ctr.cfg.Auth.JWTAccessTokenTTL, false)
 
 	echo.SetCookie(cookie)
 
-	cookie = utils.SetCookie("RefreshToken", refreshToken, ctr.cfg.Auth.JWTRefreshTokenTTL, true)
+	cookie = helpers.SetCookie("RefreshToken", refreshToken, ctr.cfg.Auth.JWTRefreshTokenTTL, true)
 
 	echo.SetCookie(cookie)
 

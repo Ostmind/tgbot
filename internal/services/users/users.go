@@ -19,7 +19,6 @@ func New(storage storage.Repository) *StorageUser {
 
 func (c StorageUser) AddUser(ctx context.Context, telegramID string, userName string, password string) (id string, refreshToken string, err error) {
 	id, refreshToken, err = c.storage.AddUser(ctx, telegramID, userName, password)
-
 	if err != nil {
 		return id, "", fmt.Errorf("failed to add user %w", err)
 	}
@@ -29,7 +28,6 @@ func (c StorageUser) AddUser(ctx context.Context, telegramID string, userName st
 
 func (c StorageUser) GetUserByTelegramID(ctx context.Context, id string) (models.User, error) {
 	user, err := c.storage.GetUserByTelegramID(ctx, id)
-
 	if err != nil {
 		return user, fmt.Errorf("failed to get user %w", err)
 	}

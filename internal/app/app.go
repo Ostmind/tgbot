@@ -8,9 +8,7 @@ import (
 	userhandler "tgbot/internal/server/handler/user"
 	srv "tgbot/internal/server/server"
 	"tgbot/internal/services/users"
-	"tgbot/internal/storage"
 	"tgbot/internal/storage/postgres"
-	"time"
 )
 
 type App struct {
@@ -26,12 +24,7 @@ func New(logger *slog.Logger, cfg *config.AppConfig) (*App, error) {
 		return nil, fmt.Errorf("couldn't establish db connection %w", err)
 	}
 
-	userStorage, err := postgres.NewUsers(db)
-	if err != nil {
-		return nil, fmt.Errorf("couldn't create categories %w", err)
-	}
-
-	userManager := users.New(userStorage)
+	userManager := users.New(db)
 
 	userHandler := userhandler.NewUserHandler(userManager, cfg, logger)
 
@@ -47,27 +40,16 @@ func New(logger *slog.Logger, cfg *config.AppConfig) (*App, error) {
 
 func (a App) Run() {
 	a.logger.Info("Starting app...")
-	err := storage.RunMigration(a.db, a.logger, a.cfg.Srv.MigrationPath)
-
-	if err != nil {
-		a.logger.Error("couldn't run migrations %w", slog.Any("error_details", err))
-	}
 
 	a.server.Run()
 }
 
-func (a App) Stop(ctx context.Context, shutdownTimeout time.Duration) {
+func (a App) Stop(ctx context.Context) {
 	a.logger.Info("Stopping app...")
-
-	timeout := shutdownTimeout
-
-	ctxWithTimeout, cancel := context.WithTimeout(ctx, timeout)
-
-	defer cancel()
 
 	doneCh := make(chan error)
 	go func() {
-		doneCh <- a.server.Stop(ctxWithTimeout)
+		doneCh <- a.server.Stop(ctx)
 	}()
 
 	select {

@@ -1,4 +1,4 @@
-package utils
+package helpers
 
 import (
 	"crypto/rand"
@@ -24,7 +24,10 @@ func NewRefreshToken() (string, error) {
 
 	rand.Read(b)
 
-	hashedRefreshToken, _ := bcrypt.GenerateFromPassword(b, bcrypt.DefaultCost)
+	hashedRefreshToken, err := bcrypt.GenerateFromPassword(b, bcrypt.DefaultCost)
+	if err != nil {
+		return "", fmt.Errorf("error adding token %w", err)
+	}
 
 	return hex.EncodeToString(hashedRefreshToken), nil
 }
@@ -37,9 +40,8 @@ func Parse(accessToken string, jwtSecret string) (string, error) {
 
 		return jwtSecret, nil
 	})
-
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("Invalid Token ")
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {

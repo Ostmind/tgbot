@@ -1,11 +1,11 @@
 package config
 
 import (
+	"errors"
 	"log"
 	"time"
 
 	"github.com/caarlos0/env/v11"
-	"github.com/hashicorp/go-multierror"
 )
 
 type AppConfig struct {
@@ -65,40 +65,38 @@ func MustNew() *AppConfig {
 	return &cfgEnv
 }
 
-func (cfg *AppConfig) Validate() error {
-	var result *multierror.Error
-
+func (cfg *AppConfig) Validate() (result error) {
 	if cfg.Srv.Host == "" {
-		result = multierror.Append(result, ErrNoServerHost)
+		result = errors.Join(result, ErrNoServerHost)
 	}
 
 	if cfg.Srv.Port == 0 {
-		result = multierror.Append(result, ErrNoServerPort)
+		result = errors.Join(result, ErrNoServerPort)
 	}
 
 	if cfg.DB.Host == "" {
-		result = multierror.Append(result, ErrNoDBHost)
+		result = errors.Join(result, ErrNoDBHost)
 	}
 
 	if cfg.DB.Port == "" {
-		result = multierror.Append(result, ErrNoDBPort)
+		result = errors.Join(result, ErrNoDBPort)
 	}
 
 	if cfg.DB.DBName == "" {
-		result = multierror.Append(result, ErrNoDBName)
+		result = errors.Join(result, ErrNoDBName)
 	}
 
 	if cfg.DB.DBUser == "" {
-		result = multierror.Append(result, ErrNoDBUser)
+		result = errors.Join(result, ErrNoDBUser)
 	}
 
 	if cfg.DB.DBPassword == "" {
-		result = multierror.Append(result, ErrNoDBPassword)
+		result = errors.Join(result, ErrNoDBPassword)
 	}
 
 	if cfg.Auth.JWTSecret == "" {
-		result = multierror.Append(result, ErrNoJWTSecret)
+		result = errors.Join(result, ErrNoJWTSecret)
 	}
 
-	return result.ErrorOrNil()
+	return result
 }

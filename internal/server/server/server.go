@@ -27,7 +27,7 @@ func New(logger *slog.Logger,
 	userHandler *user.Controller) *Server {
 	server := echo.New()
 
-	server.Use(middleware.LogRequest(logger, userHandler, cfg.Auth))
+	server.Use(middleware.LogRequestAndAuthenticateUser(logger, userHandler, cfg.Auth))
 
 	categoryGroup := server.Group("users")
 
