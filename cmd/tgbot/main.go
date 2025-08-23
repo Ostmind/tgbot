@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/Ostmind/tgbot/internal/bot"
 	"log"
 	"log/slog"
 	"os"
@@ -23,6 +24,13 @@ func main() {
 	if err != nil {
 		log.Fatal("No App cannot start server", slog.Any("error", err))
 	}
+
+	token := os.Getenv("TELEGRAM_TOKEN")
+	if token == "" {
+		panic("TELEGRAM_TOKEN not set")
+	}
+
+	bot.RunBot(token)
 
 	app.Run()
 
