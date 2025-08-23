@@ -3,7 +3,9 @@ package app
 import (
 	"context"
 	"fmt"
+	"github.com/Ostmind/tgbot/internal/bot"
 	"log/slog"
+	"os"
 
 	"github.com/Ostmind/tgbot/internal/config"
 	userhandler "github.com/Ostmind/tgbot/internal/server/handler/user"
@@ -41,6 +43,12 @@ func New(logger *slog.Logger, cfg *config.AppConfig) (*App, error) {
 
 func (a App) Run() {
 	a.logger.Info("Starting app...")
+	token := os.Getenv("TELEGRAM_TOKEN")
+	if token == "" {
+		panic("TELEGRAM_TOKEN not set")
+	}
+
+	bot.RunBot(token, a.db)
 
 	a.server.Run()
 }
