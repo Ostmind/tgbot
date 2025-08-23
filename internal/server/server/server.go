@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"tgbot/internal/config"
-	"tgbot/internal/server/handler/user"
-	"tgbot/internal/server/middleware"
-	"tgbot/internal/storage/postgres"
+
+	"github.com/Ostmind/tgbot/internal/config"
+	"github.com/Ostmind/tgbot/internal/server/handler/user"
+	"github.com/Ostmind/tgbot/internal/server/middleware"
+	"github.com/Ostmind/tgbot/internal/storage/postgres"
 
 	"github.com/labstack/echo/v4"
 )

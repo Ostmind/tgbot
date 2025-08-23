@@ -3,8 +3,9 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"tgbot/internal/helpers"
-	"tgbot/internal/models"
+
+	"github.com/Ostmind/tgbot/internal/helpers"
+	"github.com/Ostmind/tgbot/internal/models"
 )
 
 func (store *Storage) GetUserByTelegramID(ctx context.Context, id string) (user models.User, err error) {
@@ -40,7 +41,10 @@ func (store *Storage) DeleteUser(ctx context.Context, id string) error {
 	return nil
 }
 
-func (store *Storage) AddUser(ctx context.Context, telegramID string, userName string, password string) (id string, refreshToken string, err error) {
+func (store *Storage) AddUser(ctx context.Context,
+	telegramID string,
+	userName string,
+	password string) (id string, refreshToken string, err error) {
 	sqlStatement := `INSERT INTO public.users
 					(telegram_id,username,created_at,password,refresh_token) 
 					values ($1,$2,now(),$3,$4);`

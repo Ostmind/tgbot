@@ -3,9 +3,10 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"tgbot/internal/config"
-	"tgbot/internal/models"
 	"time"
+
+	"github.com/Ostmind/tgbot/internal/config"
+	"github.com/Ostmind/tgbot/internal/models"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"

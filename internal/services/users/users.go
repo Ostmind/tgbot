@@ -3,8 +3,9 @@ package users
 import (
 	"context"
 	"fmt"
-	"tgbot/internal/models"
-	"tgbot/internal/storage"
+
+	"github.com/Ostmind/tgbot/internal/models"
+	"github.com/Ostmind/tgbot/internal/storage"
 )
 
 type StorageUser struct {
@@ -17,7 +18,10 @@ func New(storage storage.Repository) *StorageUser {
 	}
 }
 
-func (c StorageUser) AddUser(ctx context.Context, telegramID string, userName string, password string) (id string, refreshToken string, err error) {
+func (c StorageUser) AddUser(ctx context.Context,
+	telegramID string,
+	userName string,
+	password string) (id string, refreshToken string, err error) {
 	id, refreshToken, err = c.storage.AddUser(ctx, telegramID, userName, password)
 	if err != nil {
 		return id, "", fmt.Errorf("failed to add user %w", err)

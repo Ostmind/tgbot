@@ -2,14 +2,14 @@ package helpers
 
 import (
 	"fmt"
-	"tgbot/internal/models"
 	"unicode"
+
+	"github.com/Ostmind/tgbot/internal/models"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 func ValidatePassword(password string) (string, error) {
-
 	hasLower := false
 	hasUpper := false
 	hasDigit := false

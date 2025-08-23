@@ -2,9 +2,10 @@ package auth
 
 import (
 	"net/http"
-	"tgbot/internal/config"
-	"tgbot/internal/helpers"
-	"tgbot/internal/server/handler/user"
+
+	"github.com/Ostmind/tgbot/internal/config"
+	"github.com/Ostmind/tgbot/internal/helpers"
+	"github.com/Ostmind/tgbot/internal/server/handler/user"
 
 	"github.com/labstack/echo/v4"
 )
@@ -35,10 +36,9 @@ func Authentication(echo echo.Context, manager *user.Controller, cfgAuth config.
 			return echo.NoContent(http.StatusBadRequest)
 		}
 
-		return nil // go out of auth then JWT is Valid
+		return nil
 	}
 
-	//check if we have refresh token and it's valid
 	if refreshTokenCookie != nil {
 		err = helpers.ComparePassword(userRepository.RefreshToken, refreshTokenCookie.Value)
 		if err != nil {

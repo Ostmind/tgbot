@@ -2,7 +2,8 @@ package storage
 
 import (
 	"context"
-	"tgbot/internal/models"
+
+	"github.com/Ostmind/tgbot/internal/models"
 )
 
 type Repository interface {

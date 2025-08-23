@@ -4,10 +4,11 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
-	"tgbot/internal/config"
-	"tgbot/internal/helpers"
-	"tgbot/internal/models"
-	"tgbot/internal/storage"
+
+	"github.com/Ostmind/tgbot/internal/config"
+	"github.com/Ostmind/tgbot/internal/helpers"
+	"github.com/Ostmind/tgbot/internal/models"
+	"github.com/Ostmind/tgbot/internal/storage"
 
 	"github.com/labstack/echo/v4"
 )

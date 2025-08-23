@@ -4,10 +4,11 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
-	"tgbot/internal/config"
-	"tgbot/internal/server/auth"
-	"tgbot/internal/server/handler/user"
 	"time"
+
+	"github.com/Ostmind/tgbot/internal/config"
+	"github.com/Ostmind/tgbot/internal/server/auth"
+	"github.com/Ostmind/tgbot/internal/server/handler/user"
 
 	"github.com/labstack/echo/v4"
 )

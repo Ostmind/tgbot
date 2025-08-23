@@ -6,9 +6,10 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
-	"tgbot/internal/app"
-	"tgbot/internal/config"
-	"tgbot/internal/logger"
+
+	"github.com/Ostmind/tgbot/internal/app"
+	"github.com/Ostmind/tgbot/internal/config"
+	"github.com/Ostmind/tgbot/internal/logger"
 )
 
 func main() {
@@ -21,7 +22,7 @@ func main() {
 	app, err := app.New(sloger, cfg)
 	if err != nil {
 		log.Fatal("No App cannot start server", slog.Any("error", err))
-	} //cfg.Srv.ServerShutdownTimeout
+	}
 
 	app.Run()
 
@@ -29,7 +30,7 @@ func main() {
 	signal.Notify(stopChan, os.Interrupt)
 
 	<-stopChan
-	sloger.Info("Recieved interrupt signal")
+	sloger.Info("Received interrupt signal")
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.Srv.ServerShutdownTimeout)
 	defer cancel()
 

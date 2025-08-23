@@ -3,7 +3,8 @@ package storage
 import (
 	"fmt"
 	"log/slog"
-	"tgbot/internal/storage/postgres"
+
+	"github.com/Ostmind/tgbot/internal/storage/postgres"
 
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"

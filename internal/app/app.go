@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"tgbot/internal/config"
-	userhandler "tgbot/internal/server/handler/user"
-	srv "tgbot/internal/server/server"
-	"tgbot/internal/services/users"
-	"tgbot/internal/storage/postgres"
+
+	"github.com/Ostmind/tgbot/internal/config"
+	userhandler "github.com/Ostmind/tgbot/internal/server/handler/user"
+	srv "github.com/Ostmind/tgbot/internal/server/server"
+	"github.com/Ostmind/tgbot/internal/services/users"
+	"github.com/Ostmind/tgbot/internal/storage/postgres"
 )
 
 type App struct {

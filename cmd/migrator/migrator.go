@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
-	"tgbot/internal/config"
+
+	"github.com/Ostmind/tgbot/internal/config"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
