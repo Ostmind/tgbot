@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func HandleStart(bot *tgbotapi.BotAPI, update tgbotapi.Update, auth *AuthManager) {
+func HandleStart(bot *tgbotapi.BotAPI, update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Welcome! Use /login to authenticate.")
 	bot.Send(msg)
 }

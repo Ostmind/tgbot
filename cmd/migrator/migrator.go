@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/Ostmind/tgbot/internal/config"
@@ -14,22 +13,23 @@ import (
 func main() {
 	cfg := config.MustNew()
 
-	connStr := fmt.Sprintf("host=%s port=%s user=%s "+
-		"password=%s dbname=%s sslmode=%s",
-		cfg.DB.Host, cfg.DB.Port, cfg.DB.DBUser, cfg.DB.DBPassword, cfg.DB.DBName, cfg.DB.DBSSLMode)
+	connStr := config.GetConnStr(cfg.DB.Host, cfg.DB.Port,
+		cfg.DB.DBUser, cfg.DB.DBPassword,
+		cfg.DB.DBName, cfg.DB.DBSSLMode)
+
 	connConfig, err := pgx.ParseConfig(connStr)
 	if err != nil {
-		log.Fatalf("migrator: failed to parse conn config: %v", err)
+		log.Fatalf("migrator: failed to parse conn config: %s", err)
 	}
 
 	db := stdlib.OpenDB(*connConfig)
 	defer db.Close()
 
 	if err = goose.SetDialect("postgres"); err != nil {
-		log.Fatalf("migrator: goose error: %v", err)
+		log.Fatalf("migrator: goose error: %s", err)
 	}
 
 	if err = goose.Up(db, cfg.Srv.MigrationPath); err != nil {
-		log.Fatalf("migrator: goose error: %v", err)
+		log.Fatalf("migrator: goose error: %s", err)
 	}
 }

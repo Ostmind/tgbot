@@ -3,15 +3,12 @@ package app
 import (
 	"context"
 	"fmt"
-	"github.com/Ostmind/tgbot/internal/bot"
-	"log/slog"
-	"os"
-
 	"github.com/Ostmind/tgbot/internal/config"
 	userhandler "github.com/Ostmind/tgbot/internal/server/handler/user"
 	srv "github.com/Ostmind/tgbot/internal/server/server"
 	"github.com/Ostmind/tgbot/internal/services/users"
 	"github.com/Ostmind/tgbot/internal/storage/postgres"
+	"log/slog"
 )
 
 type App struct {
@@ -37,20 +34,13 @@ func New(logger *slog.Logger, cfg *config.AppConfig) (*App, error) {
 		server: server,
 		logger: logger,
 		db:     db,
-		cfg:    cfg,
 	}, nil
 }
 
-func (a App) Run() {
+func (a App) Run(serverPort int) {
 	a.logger.Info("Starting app...")
-	token := os.Getenv("TELEGRAM_TOKEN")
-	if token == "" {
-		panic("TELEGRAM_TOKEN not set")
-	}
 
-	bot.RunBot(token, a.db)
-
-	a.server.Run()
+	a.server.Run(serverPort)
 }
 
 func (a App) Stop(ctx context.Context) {

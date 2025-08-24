@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -99,4 +100,10 @@ func (cfg *AppConfig) Validate() (result error) {
 	}
 
 	return result
+}
+
+func GetConnStr(host, port, user, password, dbName, sslMode string) string {
+	return fmt.Sprintf("host=%s port=%s user=%s "+
+		"password=%s dbname=%s sslmode=%s",
+		host, port, user, password, dbName, sslMode)
 }

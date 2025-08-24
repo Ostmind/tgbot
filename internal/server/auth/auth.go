@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/Ostmind/tgbot/internal/config"
@@ -48,7 +49,7 @@ func Authentication(echo echo.Context, manager *user.Controller, cfgAuth config.
 
 	err = helpers.ComparePassword(userRepository.Password, passwordCookie.Value)
 	if err != nil {
-		return err
+		return fmt.Errorf("error while authentication %s", err)
 	}
 
 	jwt, err := helpers.GenerateJWT(userRepository.UserName, cfgAuth.JWTAccessTokenTTL, cfgAuth.JWTSecret)

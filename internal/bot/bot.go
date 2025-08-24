@@ -26,7 +26,7 @@ func RunBot(token string, db *postgres.Storage) {
 
 		switch update.Message.Command() {
 		case "start":
-			HandleStart(bot, update, authManager)
+			HandleStart(bot, update)
 		case "login":
 			HandleLogin(bot, update, authManager)
 		case "verify":
