@@ -1,7 +1,7 @@
 -- +goose Up
 CREATE TABLE todos (
                        id SERIAL PRIMARY KEY,
-                       user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                       telegram_id BIGINT NOT NULL REFERENCES users(telegram_id) ON DELETE CASCADE,
                        title VARCHAR(255) NOT NULL,
                        description TEXT,
                        due_date TIMESTAMP,

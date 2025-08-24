@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/Ostmind/tgbot/internal/config"
+	"github.com/Ostmind/tgbot/internal/server/handler/todos"
 	"github.com/Ostmind/tgbot/internal/server/handler/user"
 	"github.com/Ostmind/tgbot/internal/server/middleware"
 	"github.com/Ostmind/tgbot/internal/storage/postgres"
@@ -24,7 +25,8 @@ type Server struct {
 func New(logger *slog.Logger,
 	cfg *config.AppConfig,
 	db *postgres.Storage,
-	userHandler *user.Controller) *Server {
+	userHandler *user.Controller,
+	todosHandler *todos.ToDoController) *Server {
 	server := echo.New()
 
 	server.Use(middleware.LogRequestAndAuthenticateUser(logger, userHandler, cfg.Auth))
@@ -34,6 +36,12 @@ func New(logger *slog.Logger,
 	categoryGroup.GET("", userHandler.GetUserByTelegramID)
 	categoryGroup.DELETE("/:userId", userHandler.DeleteUser)
 	categoryGroup.POST("/create/:telegramID", userHandler.AddUser)
+
+	todoGroup := server.Group("todos")
+
+	todoGroup.DELETE("/:telegramID/:title", todosHandler.DeleteToDo)
+	todoGroup.POST("/create/:telegramID/:title/:desc", todosHandler.AddToDo)
+	todoGroup.POST("/update/:telegramID/:title/:isDone", todosHandler.UpdateToDo)
 
 	return &Server{
 		logger:  logger,

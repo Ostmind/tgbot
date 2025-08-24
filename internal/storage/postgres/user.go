@@ -9,7 +9,7 @@ import (
 )
 
 func (store *Storage) GetUserByTelegramID(ctx context.Context, id string) (user models.User, err error) {
-	sqlStatement := `SELECT * FROM public.users where telegram_id =$1`
+	sqlStatement := `SELECT * FROM public.users where telegram_id =$1;`
 
 	rows, err := store.DB.Query(ctx, sqlStatement, id)
 	if err != nil {
@@ -68,7 +68,7 @@ func (store *Storage) AddUser(ctx context.Context,
 		return "", "", fmt.Errorf("error adding to DB %w", err)
 	}
 
-	sqlStatement = `SELECT id FROM public.categories where telegram_id = $1`
+	sqlStatement = `SELECT id FROM public.categories where telegram_id = $1;`
 
 	rows, err := store.DB.Query(ctx, sqlStatement, telegramID)
 	if err != nil {

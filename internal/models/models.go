@@ -10,3 +10,11 @@ type User struct {
 	Password     string    `db:"password"`
 	Created      time.Time `db:"created_at"`
 }
+
+type ToDoList struct {
+	ID          string `db:"id"`
+	TelegramID  string `db:"telegram_id"`
+	Title       string `db:"title"`
+	Description string `db:"description"`
+	Completed   bool   `db:"completed"`
+}

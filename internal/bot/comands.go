@@ -64,7 +64,7 @@ func HandleMyTodos(bot *tgbotapi.BotAPI, update tgbotapi.Update, db *postgres.St
 	var sb strings.Builder
 	for i, todo := range todos {
 		status := "❌"
-		if todo.Completed == "true" || todo.Completed == "1" {
+		if todo.Completed == true {
 			status = "✅"
 		}
 		sb.WriteString(fmt.Sprintf("%d. %s - %s %s\n", i+1, todo.Title, todo.Description, status))
