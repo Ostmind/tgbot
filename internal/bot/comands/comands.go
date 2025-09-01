@@ -1,8 +1,9 @@
-package bot
+package comands
 
 import (
 	"context"
 	"fmt"
+	"github.com/Ostmind/tgbot/internal/bot/auth"
 	"github.com/Ostmind/tgbot/internal/storage/postgres"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"strings"
@@ -13,7 +14,7 @@ func HandleStart(bot *tgbotapi.BotAPI, update tgbotapi.Update) {
 	bot.Send(msg)
 }
 
-func HandleLogin(bot *tgbotapi.BotAPI, update tgbotapi.Update, auth *AuthManager) {
+func HandleLogin(bot *tgbotapi.BotAPI, update tgbotapi.Update, auth *auth.AuthManager) {
 	chatID := update.Message.Chat.ID
 	code := auth.GenerateCode(chatID)
 	msg := tgbotapi.NewMessage(chatID,
@@ -21,7 +22,7 @@ func HandleLogin(bot *tgbotapi.BotAPI, update tgbotapi.Update, auth *AuthManager
 	bot.Send(msg)
 }
 
-func HandleVerify(bot *tgbotapi.BotAPI, update tgbotapi.Update, auth *AuthManager) {
+func HandleVerify(bot *tgbotapi.BotAPI, update tgbotapi.Update, auth *auth.AuthManager) {
 	chatID := update.Message.Chat.ID
 	args := update.Message.CommandArguments()
 	if auth.VerifyCode(chatID, args) {
@@ -33,7 +34,7 @@ func HandleVerify(bot *tgbotapi.BotAPI, update tgbotapi.Update, auth *AuthManage
 	}
 }
 
-func HandleSecret(bot *tgbotapi.BotAPI, update tgbotapi.Update, auth *AuthManager) {
+func HandleSecret(bot *tgbotapi.BotAPI, update tgbotapi.Update, auth *auth.AuthManager) {
 	chatID := update.Message.Chat.ID
 	if !auth.IsAuthenticated(chatID) {
 		msg := tgbotapi.NewMessage(chatID, "You need to authenticate first. Use /login.")

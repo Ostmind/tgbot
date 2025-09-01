@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"errors"
+	application "github.com/Ostmind/tgbot/internal/todo/app"
+	"github.com/Ostmind/tgbot/internal/todo/config"
+	"github.com/Ostmind/tgbot/internal/todo/logger"
 	"log"
 	"log/slog"
 	"net/http"
@@ -10,10 +13,6 @@ import (
 	"os/signal"
 
 	_ "net/http/pprof"
-
-	application "github.com/Ostmind/tgbot/internal/app"
-	"github.com/Ostmind/tgbot/internal/config"
-	"github.com/Ostmind/tgbot/internal/logger"
 )
 
 func main() {

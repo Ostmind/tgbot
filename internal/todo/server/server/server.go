@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/Ostmind/tgbot/internal/todo/config"
+	"github.com/Ostmind/tgbot/internal/todo/server/handler/todos"
+	"github.com/Ostmind/tgbot/internal/todo/server/handler/user"
+	"github.com/Ostmind/tgbot/internal/todo/server/middleware"
 	"log/slog"
 	"net/http"
 
-	"github.com/Ostmind/tgbot/internal/config"
-	"github.com/Ostmind/tgbot/internal/server/handler/todos"
-	"github.com/Ostmind/tgbot/internal/server/handler/user"
-	"github.com/Ostmind/tgbot/internal/server/middleware"
 	"github.com/Ostmind/tgbot/internal/storage/postgres"
 
 	"github.com/labstack/echo/v4"
@@ -26,7 +26,7 @@ func New(logger *slog.Logger,
 	cfg *config.AppConfig,
 	db *postgres.Storage,
 	userHandler *user.Controller,
-	todosHandler *todos.ToDoController) *Server {
+	todosHandler *todos.TodoController) *Server {
 	server := echo.New()
 
 	server.Use(middleware.LogRequestAndAuthenticateUser(logger, userHandler, cfg.Auth))
@@ -39,9 +39,9 @@ func New(logger *slog.Logger,
 
 	todoGroup := server.Group("todos")
 
-	todoGroup.DELETE("/:telegramID/:title", todosHandler.DeleteToDo)
-	todoGroup.POST("/create/:telegramID/:title/:desc", todosHandler.AddToDo)
-	todoGroup.POST("/update/:telegramID/:title/:isDone", todosHandler.UpdateToDo)
+	todoGroup.DELETE("/:telegramID/:title", todosHandler.DeleteTodo)
+	todoGroup.POST("/create/:telegramID/:title/:desc", todosHandler.AddTodo)
+	todoGroup.POST("/update/:telegramID/:title/:isDone", todosHandler.UpdateTodo)
 
 	return &Server{
 		logger:  logger,

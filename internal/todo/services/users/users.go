@@ -3,8 +3,8 @@ package users
 import (
 	"context"
 	"fmt"
+	"github.com/Ostmind/tgbot/internal/todo/models"
 
-	"github.com/Ostmind/tgbot/internal/models"
 	"github.com/Ostmind/tgbot/internal/storage"
 )
 

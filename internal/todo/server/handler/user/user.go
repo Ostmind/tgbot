@@ -2,12 +2,12 @@ package user
 
 import (
 	"errors"
+	"github.com/Ostmind/tgbot/internal/todo/config"
+	helpers2 "github.com/Ostmind/tgbot/internal/todo/helpers"
+	"github.com/Ostmind/tgbot/internal/todo/models"
 	"log/slog"
 	"net/http"
 
-	"github.com/Ostmind/tgbot/internal/config"
-	"github.com/Ostmind/tgbot/internal/helpers"
-	"github.com/Ostmind/tgbot/internal/models"
 	"github.com/Ostmind/tgbot/internal/storage"
 
 	"github.com/labstack/echo/v4"
@@ -54,16 +54,16 @@ func (ctr Controller) AddUser(echo echo.Context) error {
 		return echo.NoContent(http.StatusInternalServerError)
 	}
 
-	jwt, err := helpers.GenerateJWT(userNameCookie.Value, ctr.cfg.Auth.JWTAccessTokenTTL, ctr.cfg.Auth.JWTSecret)
+	jwt, err := helpers2.GenerateJWT(userNameCookie.Value, ctr.cfg.Auth.JWTAccessTokenTTL, ctr.cfg.Auth.JWTSecret)
 	if err != nil {
 		return echo.NoContent(http.StatusInternalServerError)
 	}
 
-	cookie := helpers.SetCookie("AccessToken", jwt, ctr.cfg.Auth.JWTAccessTokenTTL, false)
+	cookie := helpers2.SetCookie("AccessToken", jwt, ctr.cfg.Auth.JWTAccessTokenTTL, false)
 
 	echo.SetCookie(cookie)
 
-	cookie = helpers.SetCookie("RefreshToken", refreshToken, ctr.cfg.Auth.JWTRefreshTokenTTL, true)
+	cookie = helpers2.SetCookie("RefreshToken", refreshToken, ctr.cfg.Auth.JWTRefreshTokenTTL, true)
 
 	echo.SetCookie(cookie)
 

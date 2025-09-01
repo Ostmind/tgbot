@@ -3,12 +3,11 @@ package postgres
 import (
 	"context"
 	"fmt"
-
-	"github.com/Ostmind/tgbot/internal/helpers"
-	"github.com/Ostmind/tgbot/internal/models"
+	helpers2 "github.com/Ostmind/tgbot/internal/todo/helpers"
+	models2 "github.com/Ostmind/tgbot/internal/todo/models"
 )
 
-func (store *Storage) GetUserByTelegramID(ctx context.Context, id string) (user models.User, err error) {
+func (store *Storage) GetUserByTelegramID(ctx context.Context, id string) (user models2.User, err error) {
 	sqlStatement := `SELECT * FROM public.users where telegram_id =$1;`
 
 	rows, err := store.DB.Query(ctx, sqlStatement, id)
@@ -35,7 +34,7 @@ func (store *Storage) DeleteUser(ctx context.Context, id string) error {
 	}
 
 	if result.RowsAffected() == 0 {
-		return models.ErrNotFound
+		return models2.ErrNotFound
 	}
 
 	return nil
@@ -49,12 +48,12 @@ func (store *Storage) AddUser(ctx context.Context,
 					(telegram_id,username,created_at,password,refresh_token) 
 					values ($1,$2,now(),$3,$4);`
 
-	hashedPassword, err := helpers.ValidatePassword(password)
+	hashedPassword, err := helpers2.ValidatePassword(password)
 	if err != nil {
 		return "", "", err
 	}
 
-	hashedRefreshToken, err := helpers.NewRefreshToken()
+	hashedRefreshToken, err := helpers2.NewRefreshToken()
 	if err != nil {
 		return "", "", err
 	}
@@ -62,7 +61,7 @@ func (store *Storage) AddUser(ctx context.Context,
 	result, err := store.DB.Exec(ctx, sqlStatement, telegramID, userName, hashedPassword, hashedRefreshToken)
 	if err != nil {
 		if !result.Insert() {
-			return "", "", models.ErrUnique
+			return "", "", models2.ErrUnique
 		}
 
 		return "", "", fmt.Errorf("error adding to DB %w", err)

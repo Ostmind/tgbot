@@ -3,11 +3,10 @@ package postgres
 import (
 	"context"
 	"fmt"
-
-	"github.com/Ostmind/tgbot/internal/models"
+	models2 "github.com/Ostmind/tgbot/internal/todo/models"
 )
 
-func (store *Storage) GetUserTodos(ctx context.Context, telegramID string) ([]models.ToDoList, error) {
+func (store *Storage) GetUserTodos(ctx context.Context, telegramID string) ([]models2.ToDoList, error) {
 	query := `SELECT id, telegram_id, title, description, completed FROM public.todos WHERE telegram_id = $1`
 
 	rows, err := store.DB.Query(ctx, query, telegramID)
@@ -16,9 +15,9 @@ func (store *Storage) GetUserTodos(ctx context.Context, telegramID string) ([]mo
 	}
 	defer rows.Close()
 
-	var todos []models.ToDoList
+	var todos []models2.ToDoList
 	for rows.Next() {
-		var t models.ToDoList
+		var t models2.ToDoList
 		if err := rows.Scan(&t.ID, &t.TelegramID, &t.Title, &t.Description, &t.Completed); err != nil {
 			return nil, fmt.Errorf("scan todo: %w", err)
 		}
@@ -27,7 +26,7 @@ func (store *Storage) GetUserTodos(ctx context.Context, telegramID string) ([]mo
 	return todos, rows.Err()
 }
 
-func (store *Storage) AddToDo(ctx context.Context, telegramID string, title string, desc string) (id string, err error) {
+func (store *Storage) AddTodo(ctx context.Context, telegramID string, title string, desc string) (id string, err error) {
 	sqlStatement := `INSERT INTO public.todos
 					(telegram_id,title,description) 
 					values ($1,$2,$3);`
@@ -35,7 +34,7 @@ func (store *Storage) AddToDo(ctx context.Context, telegramID string, title stri
 	result, err := store.DB.Exec(ctx, sqlStatement, telegramID, title, desc)
 	if err != nil {
 		if !result.Insert() {
-			return "", models.ErrUnique
+			return "", models2.ErrUnique
 		}
 
 		return "", fmt.Errorf("error adding to DB %w", err)
@@ -58,7 +57,7 @@ func (store *Storage) AddToDo(ctx context.Context, telegramID string, title stri
 	return id, nil
 }
 
-func (store *Storage) DeleteToDo(ctx context.Context, telegramID string, title string) error {
+func (store *Storage) DeleteTodo(ctx context.Context, telegramID string, title string) error {
 	sqlStatement := `DELETE FROM public.todos WHERE telegram_id = $1 and title = $2;`
 
 	result, err := store.DB.Exec(ctx, sqlStatement, telegramID, title)
@@ -67,13 +66,13 @@ func (store *Storage) DeleteToDo(ctx context.Context, telegramID string, title s
 	}
 
 	if result.RowsAffected() == 0 {
-		return models.ErrNotFound
+		return models2.ErrNotFound
 	}
 
 	return nil
 }
 
-func (store *Storage) UpdateToDo(ctx context.Context, telegramID string, title string, isDone bool) error {
+func (store *Storage) UpdateTodo(ctx context.Context, telegramID string, title string, isDone bool) error {
 	sqlStatement := `UPDATE public.todos SET completed=$1 WHERE telegram_id = $2 and title = $3;`
 
 	result, err := store.DB.Exec(ctx, sqlStatement, isDone, telegramID, title)
@@ -82,7 +81,7 @@ func (store *Storage) UpdateToDo(ctx context.Context, telegramID string, title s
 	}
 
 	if result.RowsAffected() == 0 {
-		return models.ErrNotFound
+		return models2.ErrNotFound
 	}
 
 	return nil

@@ -1,14 +1,13 @@
 package middleware
 
 import (
+	"github.com/Ostmind/tgbot/internal/todo/config"
+	"github.com/Ostmind/tgbot/internal/todo/server/auth"
+	"github.com/Ostmind/tgbot/internal/todo/server/handler/user"
 	"log/slog"
 	"net/http"
 	"strings"
 	"time"
-
-	"github.com/Ostmind/tgbot/internal/config"
-	"github.com/Ostmind/tgbot/internal/server/auth"
-	"github.com/Ostmind/tgbot/internal/server/handler/user"
 
 	"github.com/labstack/echo/v4"
 )

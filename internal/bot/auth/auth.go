@@ -1,4 +1,4 @@
-package bot
+package auth
 
 import (
 	"math/rand"

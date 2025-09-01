@@ -2,9 +2,8 @@ package helpers
 
 import (
 	"fmt"
+	"github.com/Ostmind/tgbot/internal/todo/models"
 	"unicode"
-
-	"github.com/Ostmind/tgbot/internal/models"
 
 	"golang.org/x/crypto/bcrypt"
 )

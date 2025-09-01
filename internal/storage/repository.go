@@ -2,8 +2,7 @@ package storage
 
 import (
 	"context"
-
-	"github.com/Ostmind/tgbot/internal/models"
+	"github.com/Ostmind/tgbot/internal/todo/models"
 )
 
 type Repository interface {
@@ -12,9 +11,9 @@ type Repository interface {
 	DeleteUser(ctx context.Context, id string) error
 }
 
-type ToDoRepository interface {
-	AddToDo(ctx context.Context, telegramID string, title string, desc string) (id string, err error)
-	DeleteToDo(ctx context.Context, telegramID string, title string) error
-	UpdateToDo(ctx context.Context, telegramID string, title string, isDone bool) error
+type TodoRepository interface {
+	AddTodo(ctx context.Context, telegramID string, title string, desc string) (id string, err error)
+	DeleteTodo(ctx context.Context, telegramID string, title string) error
+	UpdateTodo(ctx context.Context, telegramID string, title string, isDone bool) error
 	GetUserTodos(ctx context.Context, telegramID string) ([]models.ToDoList, error)
 }

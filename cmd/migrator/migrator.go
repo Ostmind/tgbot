@@ -1,9 +1,8 @@
 package main
 
 import (
+	"github.com/Ostmind/tgbot/internal/todo/config"
 	"log"
-
-	"github.com/Ostmind/tgbot/internal/config"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
