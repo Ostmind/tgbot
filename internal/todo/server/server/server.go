@@ -1,0 +1,77 @@
+package server
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"github.com/Ostmind/tgbot/internal/todo/config"
+	"github.com/Ostmind/tgbot/internal/todo/server/handler/todos"
+	"github.com/Ostmind/tgbot/internal/todo/server/handler/user"
+	"github.com/Ostmind/tgbot/internal/todo/server/middleware"
+	"log/slog"
+	"net/http"
+
+	"github.com/Ostmind/tgbot/internal/storage/postgres"
+
+	"github.com/labstack/echo/v4"
+)
+
+type Server struct {
+	server  *echo.Echo
+	logger  *slog.Logger
+	storage *postgres.Storage
+}
+
+func New(logger *slog.Logger,
+	cfg *config.AppConfig,
+	db *postgres.Storage,
+	userHandler *user.Controller,
+	todosHandler *todos.TodoController) *Server {
+	server := echo.New()
+
+	server.Use(middleware.LogRequestAndAuthenticateUser(logger, userHandler, cfg.Auth))
+
+	categoryGroup := server.Group("users")
+
+	categoryGroup.GET("", userHandler.GetUserByTelegramID)
+	categoryGroup.DELETE("/:userId", userHandler.DeleteUser)
+	categoryGroup.POST("/create/:telegramID", userHandler.AddUser)
+
+	todoGroup := server.Group("todos")
+
+	todoGroup.DELETE("/:telegramID/:title", todosHandler.DeleteTodo)
+	todoGroup.POST("/create/:telegramID/:title/:desc", todosHandler.AddTodo)
+	todoGroup.POST("/update/:telegramID/:title/:isDone", todosHandler.UpdateTodo)
+
+	return &Server{
+		logger:  logger,
+		server:  server,
+		storage: db,
+	}
+}
+func (s Server) Run(serverPort int) {
+	s.logger.Info("Server is running on: localhost", "Port", serverPort)
+
+	if err := s.server.Start(fmt.Sprintf("localhost:%d", serverPort)); err != nil {
+		if !errors.Is(err, http.ErrServerClosed) {
+			s.logger.Error("Server starting error: %v", slog.Any("error_details", err))
+		}
+	}
+}
+
+func (s Server) Stop(ctx context.Context) error {
+	s.logger.Info("Stopping DB Connection")
+
+	s.storage.Close()
+
+	s.logger.Info("Stopping server...")
+	err := s.server.Shutdown(ctx)
+
+	if err != nil {
+		s.logger.Error("Error: ", slog.Any("error_details", err))
+
+		return fmt.Errorf("error while stopping Server Request %w", err)
+	}
+
+	return nil
+}
